@@ -1,0 +1,11 @@
+.vagrant
+
+*.apk
+*.ap_
+*.class
+bin/
+gen/
+.gradle/
+build/
+local.properties
+*.log
