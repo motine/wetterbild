@@ -106,5 +106,5 @@ The whole thing came down during X-mas 2015.
 ```text
 Design: 3h
 Android Setup: 4h
-Programming: 2h + 1h + 2h + 1h + 2h + 3h + 1h + 2h + 2h + 1h
+Programming: 2h + 1h + 2h + 1h + 2h + 3h + 1h + 2h + 2h + 1h + 2h
 ```
