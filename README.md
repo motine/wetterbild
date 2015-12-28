@@ -108,3 +108,8 @@ Design: 3h
 Android Setup: 4h
 Programming: 2h + 1h + 2h + 1h + 2h + 3h + 1h + 2h + 2h + 1h + 2h
 ```
+
+### Left for a rainy day
+
+- Do the blurring and resizing in a background thread and then trigger the image change asynchronously (e.g. via `AsyncTask`).
+- When done check if we can gather the file listing only once (weird dead object crash after 2 minutes, i guess garbage collector kills some stuff it should not).
