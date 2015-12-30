@@ -72,6 +72,8 @@ sudo adb start-server
 sudo adb devices
 ```
 
+**Also, make sure your Internet connection works.**
+
 Then you can go ahead and build and install:
 
 ```bash

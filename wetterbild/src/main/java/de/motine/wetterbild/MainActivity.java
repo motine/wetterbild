@@ -15,7 +15,7 @@ import de.motine.wetterbild.*;
 
 public class MainActivity extends Activity {
   
-  private final long CHANGE_DELAY = 7000; // ms between the photo changes
+  private final long CHANGE_DELAY = 25000; // ms between the photo changes
   // private final long CHANGE_DELAY = 650; // ms between the photo changes
   private final long WEATHER_UPDATE_FREQUENCY = 5*60; // sec between updates
   private final long FADE_DURATION = 300; // ms for the fade out / fade in respectively
