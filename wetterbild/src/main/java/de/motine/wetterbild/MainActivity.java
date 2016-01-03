@@ -17,7 +17,7 @@ import de.motine.wetterbild.*;
 
 public class MainActivity extends Activity {
   
-  private final long CHANGE_DELAY = 25; // sec between the photo changes
+  private final long CHANGE_DELAY = 60; // sec between the photo changes
   // private final long CHANGE_DELAY = 1; // sec between the photo changes
   private final long TIME_UPDATE_FREQENCY = 1; // sec between updates
   private final long WEATHER_UPDATE_FREQUENCY = 5; // min between updates
