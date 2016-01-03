@@ -16,8 +16,8 @@ import de.motine.wetterbild.*;
 
 public class MainActivity extends Activity {
   
-  // private final long CHANGE_DELAY = 25000; // ms between the photo changes
-  private final long CHANGE_DELAY = 1000; // ms between the photo changes
+  private final long CHANGE_DELAY = 60; // sec between the photo changes
+  // private final long CHANGE_DELAY = 1; // sec between the photo changes
   private final long WEATHER_UPDATE_FREQUENCY = 5*60; // sec between updates
   private final long FADE_DURATION = 300; // ms for the fade out / fade in respectively
   
@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
     
     // update time and photo
     shortUpdateHandler = new Handler();
-    shortUpdateRunnable = new Runnable() { @Override public void run() { updateTime(); changeToNextPhoto(); shortUpdateHandler.postDelayed(shortUpdateRunnable, CHANGE_DELAY); } };
+    shortUpdateRunnable = new Runnable() { @Override public void run() { updateTime(); changeToNextPhoto(); shortUpdateHandler.postDelayed(shortUpdateRunnable, CHANGE_DELAY*1000); } };
     shortUpdateHandler.postDelayed(shortUpdateRunnable, 100);
     // shortUpdateHandler.removeCallbacks(shortUpdateRunnable);
 
