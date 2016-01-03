@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.renderscript.*;
+import android.media.ExifInterface;
+import android.util.Log;
 
 /**
  * Provides a methods to apply renderscript effects to images
@@ -36,6 +38,41 @@ public class Effects {
       intrinisc.forEach(tmpOut);
       tmpOut.copyTo(outputBitmap);
       return new BitmapDrawable(context.getResources(), outputBitmap);
+    }
+    
+    // Reads the image from path and returns a scaled drawable suitable for the fire display (height=600).
+    // It also rotates the image according to the EXIF information.
+    public Drawable readScaledDrawable(String path) { // we need to scale because drawables have limited size
+      Bitmap full = BitmapFactory.decodeFile(path);
+      int width = full.getWidth();
+      int height = full.getHeight();
+    
+      try {
+        // rotate according to exif (inspired from: http://stackoverflow.com/a/11081918/4007237)
+        ExifInterface exif = new ExifInterface(path);
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);  
+        int rotationInDegrees = exifToDegrees(rotation);
+        Matrix matrix = new Matrix();
+        if (rotation != 0f) { matrix.preRotate(rotationInDegrees); }
+        // swap width and height if we need to rotate
+        Bitmap rotated = Bitmap.createBitmap(full, 0, 0, width, height, matrix, true);
+
+        // scale (we only make sure it is 600 high)
+        int newWidth = (int) (600 / (rotated.getHeight() / (double)rotated.getWidth()));
+        Bitmap scaled = Bitmap.createScaledBitmap(rotated, newWidth, 600, true);
+        return new BitmapDrawable(scaled);
+      } catch (Exception e) {
+        Log.e("wetterbild", "ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR");
+        Log.e("wetterbild", e.toString());
+      }
+      return null;
+    }
+    
+    private static int exifToDegrees(int exifOrientation) {        
+      if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; } 
+      else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) { return 180; } 
+      else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) { return 270; }            
+      return 0;    
     }
     
     public void close() {

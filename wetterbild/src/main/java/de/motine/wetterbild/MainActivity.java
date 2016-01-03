@@ -15,8 +15,8 @@ import de.motine.wetterbild.*;
 
 public class MainActivity extends Activity {
   
-  private final long CHANGE_DELAY = 25000; // ms between the photo changes
-  // private final long CHANGE_DELAY = 650; // ms between the photo changes
+  // private final long CHANGE_DELAY = 25000; // ms between the photo changes
+  private final long CHANGE_DELAY = 650; // ms between the photo changes
   private final long WEATHER_UPDATE_FREQUENCY = 5*60; // sec between updates
   private final long FADE_DURATION = 300; // ms for the fade out / fade in respectively
   
@@ -94,18 +94,41 @@ public class MainActivity extends Activity {
   }
   
   private void changeToNextPhoto() {
-    Drawable nextPhoto = photoSupply.nextPhoto();
-    // gather fitting mode
-    ImageView.ScaleType scaleType = ImageView.ScaleType.CENTER_CROP;
-    if (nextPhoto instanceof BitmapDrawable) {
-      BitmapDrawable bitmap = (BitmapDrawable)nextPhoto;
+    // This task does three things in the background before the fadeing to the new image can start:
+    // - Gather the next photo's file name form photoSupply
+    // - Read and scale this bitmap
+    // - Create a blurred version of the image
+    // The first array item passed to onPostExecute is the scaled image, the second is a blurred version of it.
+    new AsyncTask<Void, Void, Drawable[]>() {
+      protected Drawable[] doInBackground(Void... params) {
+        // gather and scale photo
+        String path = photoSupply.nextPhoto();
+        Drawable nextPhoto;
+        if (path != null) {
+          nextPhoto = effects.readScaledDrawable(path);
+        } else {
+          nextPhoto = getResources().getDrawable(R.drawable.ic_launcher);
+        }
+        Drawable blurred = effects.blur(((BitmapDrawable)nextPhoto).getBitmap()); // hard assumption: we have a bitmap drawable
+        return new Drawable[]{nextPhoto, blurred};
+      }
+      protected void onPostExecute(Drawable[] photos) {
+        Drawable scaled = photos[0];
+        Drawable blurred = photos[1];
+        imageFader.fadeTo(scaled, inferScaleMode(scaled));
+    
+        backgroundFader.fadeTo(blurred, null);
+      }
+    }.execute();
+  }
+  
+  private ImageView.ScaleType inferScaleMode(Drawable photo) {
+    if (photo instanceof BitmapDrawable) {
+      BitmapDrawable bitmap = (BitmapDrawable)photo;
       if (bitmap.getIntrinsicWidth() < bitmap.getIntrinsicHeight()) { // portrait
-        scaleType = ImageView.ScaleType.CENTER_INSIDE;
+        return ImageView.ScaleType.CENTER_INSIDE;
       }
     }
-    imageFader.fadeTo(nextPhoto, scaleType);
-    
-    Drawable blurred = effects.blur(((BitmapDrawable)nextPhoto).getBitmap()); // assumption: we have a bitmap drawable
-    backgroundFader.fadeTo(blurred, null);
+    return ImageView.ScaleType.CENTER_CROP;
   }
 }
