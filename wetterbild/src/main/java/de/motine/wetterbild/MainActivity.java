@@ -19,15 +19,13 @@ public class MainActivity extends Activity {
   private final long CHANGE_DELAY = 60; // sec between the photo changes
   // private final long CHANGE_DELAY = 1; // sec between the photo changes
   private final long WEATHER_UPDATE_FREQUENCY = 5*60; // sec between updates
+  private final long TIME_UPDATE_FREQENCY = 1; // sec between updates
+  private final long BRIGHTNESS_UPDATE_FREQUENCY = 1*60; // sec between updates
   private final long FADE_DURATION = 300; // ms for the fade out / fade in respectively
   
   TextView timeView;
   ImageView photoView;
   // change photo timer
-  private Handler shortUpdateHandler;
-  private Runnable shortUpdateRunnable;
-  private Handler longUpdateHandler;
-  private Runnable longUpdateRunnable;
   private PhotoSupply photoSupply;
   private Crossfader imageFader;
   private Crossfader backgroundFader;
@@ -55,17 +53,10 @@ public class MainActivity extends Activity {
     photoSupply = new PhotoSupply(this);
     weatherSource = new WeatherSource(weatherDisplay);
     
-    // update time and photo
-    shortUpdateHandler = new Handler();
-    shortUpdateRunnable = new Runnable() { @Override public void run() { updateTime(); changeToNextPhoto(); shortUpdateHandler.postDelayed(shortUpdateRunnable, CHANGE_DELAY*1000); } };
-    shortUpdateHandler.postDelayed(shortUpdateRunnable, 100);
-    // shortUpdateHandler.removeCallbacks(shortUpdateRunnable);
-
-    // update weather
-    longUpdateHandler = new Handler();
-    longUpdateRunnable = new Runnable() { @Override public void run() { updateBrightness(); weatherSource.update(); longUpdateHandler.postDelayed(longUpdateRunnable, WEATHER_UPDATE_FREQUENCY * 1000); } };
-    longUpdateHandler.postDelayed(longUpdateRunnable, 100);
-
+    new PeriodicExecuter(new Runnable() { @Override public void run() { updateTime(); } }, TIME_UPDATE_FREQENCY);
+    new PeriodicExecuter(new Runnable() { @Override public void run() { changeToNextPhoto(); } }, CHANGE_DELAY);
+    new PeriodicExecuter(new Runnable() { @Override public void run() { updateBrightness(); } }, BRIGHTNESS_UPDATE_FREQUENCY);
+    new PeriodicExecuter(new Runnable() { @Override public void run() { weatherSource.update(); } }, WEATHER_UPDATE_FREQUENCY);
   }
     
   private void enableFullscreen() {
