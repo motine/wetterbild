@@ -100,7 +100,6 @@ rm -rf /home/vagrant/.gradle/caches # If the build takes ages and then fails due
 android create project -g -v 0.10.+ --target android-22 --name wetterbild --path /vagrant/wetterbild --activity MainActivity --package de.motine.wetterbild
 ```
 
-
 ### Time sheet
 
 The whole thing came down during X-mas 2015.
@@ -110,8 +109,3 @@ Design: 3h
 Android Setup: 4h
 Programming: 2h + 1h + 2h + 1h + 2h + 3h + 1h + 2h + 2h + 1h + 2h
 ```
-
-### Left for a rainy day
-
-- Do the blurring and resizing in a background thread and then trigger the image change asynchronously (e.g. via `AsyncTask`).
-- When done check if we can gather the file listing only once (weird dead object crash after 2 minutes, i guess garbage collector kills some stuff it should not).
