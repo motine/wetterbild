@@ -54,7 +54,7 @@ public class PhotoSupply {
 
   public Drawable nextPhoto() {
     // evil to do this every time...
-    File root_path = new File(Environment.getExternalStorageDirectory(), Custom.PHOTO_FOLDER);
+    File root_path = new File(Custom.PHOTO_FOLDER);
     ArrayList<String> files = listJPGs(root_path);
 
     if (files.size() == 0) {
@@ -80,7 +80,7 @@ public class PhotoSupply {
     for (File entry : dir.listFiles()) {
       if (entry.isFile()) {
         String lower = entry.getName().toLowerCase();
-        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
+        if ((!lower.startsWith(".")) && (lower.endsWith(".jpg") || lower.endsWith(".jpeg"))) {
           fileTree.add(entry.getAbsolutePath());
         }
       } else {
