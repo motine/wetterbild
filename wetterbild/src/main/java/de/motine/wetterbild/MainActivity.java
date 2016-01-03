@@ -1,5 +1,7 @@
 package de.motine.wetterbild;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.*;
 
 import android.app.Activity;
@@ -15,28 +17,28 @@ import de.motine.wetterbild.*;
 
 public class MainActivity extends Activity {
   
-  // private final long CHANGE_DELAY = 25000; // ms between the photo changes
-  private final long CHANGE_DELAY = 650; // ms between the photo changes
-  private final long WEATHER_UPDATE_FREQUENCY = 5*60; // sec between updates
+  private final long CHANGE_DELAY = 25; // sec between the photo changes
+  // private final long CHANGE_DELAY = 1; // sec between the photo changes
+  private final long TIME_UPDATE_FREQENCY = 1; // sec between updates
+  private final long WEATHER_UPDATE_FREQUENCY = 5; // min between updates
+  private final long BRIGHTNESS_UPDATE_FREQUENCY = 1; // min between updates
   private final long FADE_DURATION = 300; // ms for the fade out / fade in respectively
   
   TextView timeView;
   ImageView photoView;
   // change photo timer
-  private Handler shortUpdateHandler;
-  private Runnable shortUpdateRunnable;
-  private Handler longUpdateHandler;
-  private Runnable longUpdateRunnable;
+  private ScheduledThreadPoolExecutor executor;
   private PhotoSupply photoSupply;
   private Crossfader imageFader;
   private Crossfader backgroundFader;
   private WeatherDisplay weatherDisplay;
   private WeatherSource weatherSource;
   private Effects effects;
-  
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    executor = new ScheduledThreadPoolExecutor(1);
     enableFullscreen();
     setContentView(R.layout.main);
 
@@ -54,16 +56,10 @@ public class MainActivity extends Activity {
     photoSupply = new PhotoSupply(this);
     weatherSource = new WeatherSource(weatherDisplay);
     
-    // update time and photo
-    shortUpdateHandler = new Handler();
-    shortUpdateRunnable = new Runnable() { @Override public void run() { updateTime(); changeToNextPhoto(); shortUpdateHandler.postDelayed(shortUpdateRunnable, CHANGE_DELAY); } };
-    shortUpdateHandler.postDelayed(shortUpdateRunnable, 100);
-    // shortUpdateHandler.removeCallbacks(shortUpdateRunnable);
-
-    // update weather
-    longUpdateHandler = new Handler();
-    longUpdateRunnable = new Runnable() { @Override public void run() { updateBrightness(); weatherSource.update(); longUpdateHandler.postDelayed(longUpdateRunnable, WEATHER_UPDATE_FREQUENCY * 1000); } };
-    longUpdateHandler.postDelayed(longUpdateRunnable, 100);
+    executor.scheduleWithFixedDelay(new Runnable() { @Override public void run() { updateTime(); } }, 0L, TIME_UPDATE_FREQENCY, TimeUnit.SECONDS);
+    executor.scheduleWithFixedDelay(new Runnable() { @Override public void run() { changeToNextPhoto(); } }, 0L, CHANGE_DELAY, TimeUnit.SECONDS);
+    executor.scheduleWithFixedDelay(new Runnable() { @Override public void run() { updateBrightness(); } }, 0L, BRIGHTNESS_UPDATE_FREQUENCY, TimeUnit.MINUTES);
+    executor.scheduleWithFixedDelay(new Runnable() { @Override public void run() { weatherSource.update(); } }, 0L, WEATHER_UPDATE_FREQUENCY, TimeUnit.MINUTES);
   }
     
   private void enableFullscreen() {
